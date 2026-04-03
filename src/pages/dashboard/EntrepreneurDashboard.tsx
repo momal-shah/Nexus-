@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Bell, Calendar, TrendingUp, AlertCircle, PlusCircle } from 'lucide-react';
+import { Users, Bell, Calendar, TrendingUp, AlertCircle, PlusCircle, Video } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Card, CardBody, CardHeader } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { CollaborationRequestCard } from '../../components/collaboration/CollaborationRequestCard';
 import { InvestorCard } from '../../components/investor/InvestorCard';
+import MeetingCalendar from '../../components/MeetingSchedulingCalendar'; 
 import { useAuth } from '../../context/AuthContext';
 import { CollaborationRequest } from '../../types';
 import { getRequestsForEntrepreneur } from '../../data/collaborationRequests';
@@ -18,7 +19,6 @@ export const EntrepreneurDashboard: React.FC = () => {
   
   useEffect(() => {
     if (user) {
-      // Load collaboration requests
       const requests = getRequestsForEntrepreneur(user.id);
       setCollaborationRequests(requests);
     }
@@ -44,13 +44,18 @@ export const EntrepreneurDashboard: React.FC = () => {
           <p className="text-gray-600">Here's what's happening with your startup today</p>
         </div>
         
-        <Link to="/investors">
-          <Button
-            leftIcon={<PlusCircle size={18} />}
-          >
-            Find Investors
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          {/* NEW VIDEO BUTTON ADDED HERE */}
+          <Link to="/video">
+            <Button leftIcon={<Video size={18} />}>
+              Start Meeting
+            </Button>
+          </Link>
+
+          <Link to="/investors">
+            <Button leftIcon={<PlusCircle size={18} />}>Find Investors</Button>
+          </Link>
+        </div>
       </div>
       
       {/* Summary cards */}
@@ -147,7 +152,7 @@ export const EntrepreneurDashboard: React.FC = () => {
           </Card>
         </div>
         
-        {/* Recommended investors */}
+        {/* Right Column: Recommended Investors + Calendar */}
         <div className="space-y-4">
           <Card>
             <CardHeader className="flex justify-between items-center">
@@ -159,14 +164,13 @@ export const EntrepreneurDashboard: React.FC = () => {
             
             <CardBody className="space-y-4">
               {recommendedInvestors.map(investor => (
-                <InvestorCard
-                  key={investor.id}
-                  investor={investor}
-                  showActions={false}
-                />
+                <InvestorCard key={investor.id} investor={investor} showActions={false} />
               ))}
             </CardBody>
           </Card>
+
+          {/* CALENDAR ADDED HERE */}
+          <MeetingCalendar />
         </div>
       </div>
     </div>

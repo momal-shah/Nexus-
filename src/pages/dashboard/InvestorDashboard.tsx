@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, PieChart, Filter, Search, PlusCircle } from 'lucide-react';
+import { Users, PieChart, Filter, Search, PlusCircle, Video } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Card, CardBody, CardHeader } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
 import { Badge } from '../../components/ui/Badge';
 import { EntrepreneurCard } from '../../components/entrepreneur/EntrepreneurCard';
+import MeetingCalendar from '../../components/MeetingSchedulingCalendar'; 
 import { useAuth } from '../../context/AuthContext';
 import { Entrepreneur } from '../../types';
 import { entrepreneurs } from '../../data/users';
@@ -18,30 +19,23 @@ export const InvestorDashboard: React.FC = () => {
   
   if (!user) return null;
   
-  // Get collaboration requests sent by this investor
   const sentRequests = getRequestsFromInvestor(user.id);
-  const requestedEntrepreneurIds = sentRequests.map(req => req.entrepreneurId);
   
-  // Filter entrepreneurs based on search and industry filters
   const filteredEntrepreneurs = entrepreneurs.filter(entrepreneur => {
-    // Search filter
     const matchesSearch = searchQuery === '' || 
       entrepreneur.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       entrepreneur.startupName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       entrepreneur.industry.toLowerCase().includes(searchQuery.toLowerCase()) ||
       entrepreneur.pitchSummary.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Industry filter
     const matchesIndustry = selectedIndustries.length === 0 || 
       selectedIndustries.includes(entrepreneur.industry);
     
     return matchesSearch && matchesIndustry;
   });
   
-  // Get unique industries for filter
   const industries = Array.from(new Set(entrepreneurs.map(e => e.industry)));
   
-  // Toggle industry selection
   const toggleIndustry = (industry: string) => {
     setSelectedIndustries(prevSelected => 
       prevSelected.includes(industry)
@@ -58,13 +52,18 @@ export const InvestorDashboard: React.FC = () => {
           <p className="text-gray-600">Find and connect with promising entrepreneurs</p>
         </div>
         
-        <Link to="/entrepreneurs">
-          <Button
-            leftIcon={<PlusCircle size={18} />}
-          >
-            View All Startups
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          {/* NEW VIDEO BUTTON ADDED HERE */}
+          <Link to="/video">
+            <Button leftIcon={<Video size={18} />}>
+              Start Meeting
+            </Button>
+          </Link>
+
+          <Link to="/entrepreneurs">
+            <Button leftIcon={<PlusCircle size={18} />}>View All Startups</Button>
+          </Link>
+        </div>
       </div>
       
       {/* Filters and search */}
@@ -158,10 +157,7 @@ export const InvestorDashboard: React.FC = () => {
             {filteredEntrepreneurs.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredEntrepreneurs.map(entrepreneur => (
-                  <EntrepreneurCard
-                    key={entrepreneur.id}
-                    entrepreneur={entrepreneur}
-                  />
+                  <EntrepreneurCard key={entrepreneur.id} entrepreneur={entrepreneur} />
                 ))}
               </div>
             ) : (
@@ -182,6 +178,9 @@ export const InvestorDashboard: React.FC = () => {
           </CardBody>
         </Card>
       </div>
+
+      {/* CALENDAR ADDED HERE */}
+      <MeetingCalendar />
     </div>
   );
 };
