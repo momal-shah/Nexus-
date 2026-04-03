@@ -1,88 +1,204 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, XCircle } from 'lucide-react';
+import { User, CircleDollarSign, Building2, LogIn, AlertCircle } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { UserRole } from '../../types';
 
-const LoginPage: React.FC = () => {
-  const navigate = useNavigate();
+export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState<UserRole>('entrepreneur');
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
+  
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    if (!email.trim() || !email.includes('@')) { setError('Please enter a valid email'); return; }
-    if (!password) { setError('Please enter your password'); return; }
-
+    setError(null);
     setIsLoading(true);
-    setTimeout(() => {
+    
+    try {
+      await login(email, password, role);
+      // Redirect based on user role
+      navigate(role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor');
+    } catch (err) {
+      setError((err as Error).message);
       setIsLoading(false);
-      navigate('/dashboard/entrepreneur');
-    }, 1500);
+    }
   };
-
+  
+  // For demo purposes, pre-filled credentials
+  const fillDemoCredentials = (userRole: UserRole) => {
+    if (userRole === 'entrepreneur') {
+      setEmail('sarah@techwave.io');
+      setPassword('password123');
+    } else {
+      setEmail('michael@vcinnovate.com');
+      setPassword('password123');
+    }
+    setRole(userRole);
+  };
+  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-700 flex flex-col items-center justify-center p-6">
-      <div className="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2" />
-      <div className="absolute bottom-0 right-0 w-80 h-80 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3" />
-      <div className="relative z-10 w-full max-w-[440px]">
-        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden">
-          <div className="bg-gradient-to-r from-violet-600 to-indigo-600 px-6 py-8 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-3 border border-white/20">
-              <Mail size={28} className="text-white/80" />
-            </div>
-            <h1 className="text-2xl font-extrabold text-white mb-1">Welcome Back</h1>
-            <p className="text-violet-200 text-sm">Sign in to Business Nexus</p>
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="flex justify-center">
+          <div className="w-12 h-12 bg-primary-600 rounded-md flex items-center justify-center">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white">
+              <path d="M20 7H4C2.89543 7 2 7.89543 2 9V19C2 20.1046 2.89543 21 4 21H20C21.1046 21 22 20.1046 22 19V9C22 7.89543 21.1046 7 20 7Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M16 21V5C16 3.89543 15.1046 3 14 3H10C8.89543 3 8 3.89543 8 5V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </div>
+        </div>
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Sign in to Business Nexus
+        </h2>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          Connect with investors and entrepreneurs
+        </p>
+      </div>
 
-          <div className="px-6 sm:px-8 py-6 sm:py-8">
-            {error && (
-              <div className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-xl mb-6">
-                <XCircle size={14} className="text-red-500 shrink-0" />
-                <p className="text-xs font-semibold text-red-600">{error}</p>
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          {error && (
+            <div className="mb-4 bg-error-50 border border-error-500 text-error-700 px-4 py-3 rounded-md flex items-start">
+              <AlertCircle size={18} className="mr-2 mt-0.5" />
+              <span>{error}</span>
+            </div>
+          )}
+          
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                I am a
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  className={`py-3 px-4 border rounded-md flex items-center justify-center transition-colors ${
+                    role === 'entrepreneur'
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                      : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setRole('entrepreneur')}
+                >
+                  <Building2 size={18} className="mr-2" />
+                  Entrepreneur
+                </button>
+                
+                <button
+                  type="button"
+                  className={`py-3 px-4 border rounded-md flex items-center justify-center transition-colors ${
+                    role === 'investor'
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                      : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setRole('investor')}
+                >
+                  <CircleDollarSign size={18} className="mr-2" />
+                  Investor
+                </button>
               </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Email Address</label>
-                <div className="relative">
-                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setError(''); }} placeholder="you@company.com" className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm font-medium text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-violet-400 focus:border-violet-400 outline-none transition" autoFocus />
-                </div>
+            </div>
+            
+            <Input
+              label="Email address"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              fullWidth
+              startAdornment={<User size={18} />}
+            />
+            
+            <Input
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              fullWidth
+            />
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                  Remember me
+                </label>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Password</label>
-                <div className="relative">
-                  <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => { setPassword(e.target.value); setError(''); }} placeholder="Enter your password" className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl pl-10 pr-10 py-3 text-sm font-medium text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-violet-400 focus:border-violet-400 outline-none transition" />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 transition">
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
+              <div className="text-sm">
+                <a href="#" className="font-medium text-primary-600 hover:text-primary-500">
+                  Forgot your password?
+                </a>
               </div>
-
-              <button type="submit" disabled={isLoading} className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-violet-200/50 transition-all disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.98]">
-                {isLoading ? (
-                  <span className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Signing in...
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    Sign In <ArrowRight size={16} />
-                  </span>
-                )}
-              </button>
-            </form>
-
-            <div className="text-center mt-6 border-t border-gray-100 pt-5">
-              <p className="text-sm text-gray-400">
+            </div>
+            
+            <Button
+              type="submit"
+              fullWidth
+              isLoading={isLoading}
+              leftIcon={<LogIn size={18} />}
+            >
+              Sign in
+            </Button>
+          </form>
+          
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Demo Accounts</span>
+              </div>
+            </div>
+            
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <Button
+                variant="outline"
+                onClick={() => fillDemoCredentials('entrepreneur')}
+                leftIcon={<Building2 size={16} />}
+              >
+                Entrepreneur Demo
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => fillDemoCredentials('investor')}
+                leftIcon={<CircleDollarSign size={16} />}
+              >
+                Investor Demo
+              </Button>
+            </div>
+          </div>
+          
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or</span>
+              </div>
+            </div>
+            
+            <div className="mt-2 text-center">
+              <p className="text-sm text-gray-600">
                 Don't have an account?{' '}
-                <Link to="/register" className="text-violet-600 font-semibold hover:text-violet-700 transition">Create one</Link>
+                <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
+                  Sign up
+                </Link>
               </p>
             </div>
           </div>
@@ -91,5 +207,3 @@ const LoginPage: React.FC = () => {
     </div>
   );
 };
-
-export { LoginPage };
