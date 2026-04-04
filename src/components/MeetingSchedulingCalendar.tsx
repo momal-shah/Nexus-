@@ -49,6 +49,26 @@ const MeetingScheduleCalendar: React.FC = () => {
   const toDateString = (date: Date) => date.toISOString().split('T')[0];
   const getMeetingsForDate = (date: Date) => requests.filter(r => r.date === toDateString(date));
 
+  const getAvailableSlotsForDate = (date: Date): string[] => {
+    const dateStr = toDateString(date);
+    const mockSlots: Record<string, string[]> = {
+      '2025-01-06': ['09:00 AM', '01:00 PM'],
+      '2025-01-08': ['10:00 AM', '02:00 PM', '04:00 PM'],
+      '2025-01-10': ['11:00 AM', '03:00 PM'],
+      '2025-01-12': ['09:00 AM', '01:00 PM', '04:00 PM'],
+      '2025-01-15': ['10:00 AM', '02:00 PM'],
+      '2025-01-18': ['09:00 AM', '11:00 AM', '03:00 PM'],
+      '2025-01-20': ['10:00 AM', '02:00 PM'],
+      '2025-01-22': ['09:00 AM', '01:00 PM', '04:00 PM'],
+    };
+    
+    if (mockSlots[dateStr]) {
+      return mockSlots[dateStr];
+    }
+    
+    return ['10:00 AM', '01:00 PM', '03:30 PM'];
+  };
+
   const handleJoinCall = (meetingId: string) => {
     const meeting = requests.find(r => r.id === meetingId);
     if (meeting) {
@@ -95,13 +115,16 @@ const MeetingScheduleCalendar: React.FC = () => {
   const pendingRequests = requests.filter(r => r.status === 'pending');
   const confirmedMeetings = requests.filter(r => r.status === 'confirmed');
   const selectedMeetings = getMeetingsForDate(selectedDate);
+  const availableSlots = getAvailableSlotsForDate(selectedDate);
 
   const tileContent = ({ date, view }: { date: Date; view: string }) => {
     if (view !== 'month') return null;
     const meetings = getMeetingsForDate(date);
-    if (meetings.length === 0) return null;
+    const slots = getAvailableSlotsForDate(date);
+    if (meetings.length === 0 && slots.length === 0) return null;
     return (
       <div className="flex justify-center gap-0.5 mt-0.5">
+        {slots.length > 0 && <div className="w-1 h-1 rounded-full bg-emerald-400" title="Available" />}
         {meetings.slice(0, 3).map((m) => {
           const color = getColor(requests.indexOf(m));
           return <div key={m.id} className="w-1 h-1 rounded-full" style={{ backgroundColor: color.dot }} title={`${m.title} - ${m.time}`} />;
@@ -231,6 +254,36 @@ const MeetingScheduleCalendar: React.FC = () => {
             <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm">
               <p className="text-[10px] sm:text-[11px] font-bold text-violet-400 uppercase tracking-widest mb-1 sm:mb-1.5">Selected Date</p>
               <p className="text-sm sm:text-base font-extrabold text-gray-900 leading-snug">{formatDateLong(selectedDate)}</p>
+            </div>
+
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
+                <p className="text-[10px] sm:text-[11px] font-bold text-emerald-400 uppercase tracking-widest">Available Slots</p>
+                {availableSlots.length > 0 && (
+                  <span className="text-[10px] sm:text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">{availableSlots.length} Open</span>
+                )}
+              </div>
+              {availableSlots.length === 0 ? (
+                <div className="flex flex-col items-center py-2">
+                  <p className="text-[11px] sm:text-xs text-gray-300">No slots set</p>
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                  {availableSlots.map((slot, idx) => (
+                    <button 
+                      key={idx} 
+                      onClick={() => {
+                        const [time] = slot.split(' ');
+                        setNewMeeting({ title: '', time: time, requester: '', date: toDateString(selectedDate) });
+                        setIsScheduleModalOpen(true);
+                      }}
+                      className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border-2 border-emerald-200 text-emerald-700 bg-emerald-50/50 text-[11px] sm:text-xs font-semibold hover:bg-emerald-100 hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-sm"
+                    >
+                      {slot}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm flex-1 min-h-[160px] sm:min-h-[200px] flex flex-col">

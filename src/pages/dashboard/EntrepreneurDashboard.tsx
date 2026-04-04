@@ -6,7 +6,6 @@ import { Card, CardBody, CardHeader } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { CollaborationRequestCard } from '../../components/collaboration/CollaborationRequestCard';
 import { InvestorCard } from '../../components/investor/InvestorCard';
-import MeetingCalendar from '../../components/MeetingSchedulingCalendar'; 
 import { useAuth } from '../../context/AuthContext';
 import { CollaborationRequest } from '../../types';
 import { getRequestsForEntrepreneur } from '../../data/collaborationRequests';
@@ -152,7 +151,7 @@ export const EntrepreneurDashboard: React.FC = () => {
           </Card>
         </div>
         
-        {/* Right Column: Recommended Investors + Calendar */}
+        {/* Right Column: Recommended Investors */}
         <div className="space-y-4">
           <Card>
             <CardHeader className="flex justify-between items-center">
@@ -168,9 +167,6 @@ export const EntrepreneurDashboard: React.FC = () => {
               ))}
             </CardBody>
           </Card>
-
-          {/* CALENDAR ADDED HERE */}
-          <MeetingCalendar />
         </div>
       </div>
     </div>
