@@ -52,7 +52,6 @@ export const InvestorDashboard: React.FC = () => {
         </div>
         
         <div className="flex gap-2">
-          {/* NEW VIDEO BUTTON ADDED HERE */}
           <Link to="/video">
             <Button leftIcon={<Video size={18} />}>
               Start Meeting
@@ -98,48 +97,64 @@ export const InvestorDashboard: React.FC = () => {
         </div>
       </div>
       
-      {/* Stats summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-primary-50 border border-primary-100">
+      {/* Stats summary - INVESTOR FINANCIAL THEME */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-slate-800 border border-slate-700">
           <CardBody>
             <div className="flex items-center">
-              <div className="p-3 bg-primary-100 rounded-full mr-4">
-                <Users size={20} className="text-primary-700" />
+              <div className="p-3 bg-slate-700 rounded-full mr-4">
+                <PieChart size={20} className="text-cyan-400" />
               </div>
               <div>
-                <p className="text-sm font-medium text-primary-700">Total Startups</p>
-                <h3 className="text-xl font-semibold text-primary-900">{entrepreneurs.length}</h3>
+                <p className="text-sm font-medium text-slate-400">Portfolio Value</p>
+                <h3 className="text-xl font-semibold text-white">$1.2M</h3>
               </div>
             </div>
           </CardBody>
         </Card>
         
-        <Card className="bg-secondary-50 border border-secondary-100">
+        <Card className="bg-slate-800 border border-slate-700">
           <CardBody>
             <div className="flex items-center">
-              <div className="p-3 bg-secondary-100 rounded-full mr-4">
-                <PieChart size={20} className="text-secondary-700" />
+              <div className="p-3 bg-slate-700 rounded-full mr-4">
+                <Users size={20} className="text-emerald-400" />
               </div>
               <div>
-                <p className="text-sm font-medium text-secondary-700">Industries</p>
-                <h3 className="text-xl font-semibold text-secondary-900">{industries.length}</h3>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-        
-        <Card className="bg-accent-50 border border-accent-100">
-          <CardBody>
-            <div className="flex items-center">
-              <div className="p-3 bg-accent-100 rounded-full mr-4">
-                <Users size={20} className="text-accent-700" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-accent-700">Your Connections</p>
-                <h3 className="text-xl font-semibold text-accent-900">
+                <p className="text-sm font-medium text-slate-400">Active Deals</p>
+                <h3 className="text-xl font-semibold text-white">
                   {sentRequests.filter(req => req.status === 'accepted').length}
                 </h3>
               </div>
+            </div>
+          </CardBody>
+        </Card>
+        
+        <Card className="bg-slate-800 border border-slate-700">
+          <CardBody>
+            <div className="flex items-center">
+              <div className="p-3 bg-slate-700 rounded-full mr-4">
+                <Users size={20} className="text-violet-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-400">Startups Reviewed</p>
+                <h3 className="text-xl font-semibold text-white">{entrepreneurs.length}</h3>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+
+        {/* FAKE MINI CHART - Makes it look like a real financial dashboard */}
+        <Card className="bg-slate-800 border border-slate-700">
+          <CardBody>
+            <p className="text-sm font-medium text-slate-400 mb-3">Monthly Activity</p>
+            <div className="flex items-end gap-1.5 h-10">
+              <div className="w-full bg-cyan-500/80 rounded-sm" style={{ height: '40%' }}></div>
+              <div className="w-full bg-cyan-500/80 rounded-sm" style={{ height: '70%' }}></div>
+              <div className="w-full bg-cyan-400 rounded-sm" style={{ height: '50%' }}></div>
+              <div className="w-full bg-cyan-500/80 rounded-sm" style={{ height: '90%' }}></div>
+              <div className="w-full bg-emerald-400 rounded-sm" style={{ height: '100%' }}></div>
+              <div className="w-full bg-cyan-500/80 rounded-sm" style={{ height: '60%' }}></div>
+              <div className="w-full bg-cyan-500/80 rounded-sm" style={{ height: '80%' }}></div>
             </div>
           </CardBody>
         </Card>

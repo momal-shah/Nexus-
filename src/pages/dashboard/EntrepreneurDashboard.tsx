@@ -44,7 +44,6 @@ export const EntrepreneurDashboard: React.FC = () => {
         </div>
         
         <div className="flex gap-2">
-          {/* NEW VIDEO BUTTON ADDED HERE */}
           <Link to="/video">
             <Button leftIcon={<Video size={18} />}>
               Start Meeting
@@ -57,31 +56,31 @@ export const EntrepreneurDashboard: React.FC = () => {
         </div>
       </div>
       
-      {/* Summary cards */}
+      {/* Summary cards - ENTREPRENEUR WORKSPACE THEME */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-primary-50 border border-primary-100">
+        <Card className="bg-blue-50 border border-blue-100">
           <CardBody>
             <div className="flex items-center">
-              <div className="p-3 bg-primary-100 rounded-full mr-4">
-                <Bell size={20} className="text-primary-700" />
+              <div className="p-3 bg-blue-100 rounded-full mr-4">
+                <Bell size={20} className="text-blue-700" />
               </div>
               <div>
-                <p className="text-sm font-medium text-primary-700">Pending Requests</p>
-                <h3 className="text-xl font-semibold text-primary-900">{pendingRequests.length}</h3>
+                <p className="text-sm font-medium text-blue-700">Pending Requests</p>
+                <h3 className="text-xl font-semibold text-blue-900">{pendingRequests.length}</h3>
               </div>
             </div>
           </CardBody>
         </Card>
         
-        <Card className="bg-secondary-50 border border-secondary-100">
+        <Card className="bg-emerald-50 border border-emerald-100">
           <CardBody>
             <div className="flex items-center">
-              <div className="p-3 bg-secondary-100 rounded-full mr-4">
-                <Users size={20} className="text-secondary-700" />
+              <div className="p-3 bg-emerald-100 rounded-full mr-4">
+                <Users size={20} className="text-emerald-700" />
               </div>
               <div>
-                <p className="text-sm font-medium text-secondary-700">Total Connections</p>
-                <h3 className="text-xl font-semibold text-secondary-900">
+                <p className="text-sm font-medium text-emerald-700">Active Connections</p>
+                <h3 className="text-xl font-semibold text-emerald-900">
                   {collaborationRequests.filter(req => req.status === 'accepted').length}
                 </h3>
               </div>
@@ -89,29 +88,29 @@ export const EntrepreneurDashboard: React.FC = () => {
           </CardBody>
         </Card>
         
-        <Card className="bg-accent-50 border border-accent-100">
+        <Card className="bg-amber-50 border border-amber-100">
           <CardBody>
             <div className="flex items-center">
-              <div className="p-3 bg-accent-100 rounded-full mr-4">
-                <Calendar size={20} className="text-accent-700" />
+              <div className="p-3 bg-amber-100 rounded-full mr-4">
+                <Calendar size={20} className="text-amber-700" />
               </div>
               <div>
-                <p className="text-sm font-medium text-accent-700">Upcoming Meetings</p>
-                <h3 className="text-xl font-semibold text-accent-900">2</h3>
+                <p className="text-sm font-medium text-amber-700">Meetings Scheduled</p>
+                <h3 className="text-xl font-semibold text-amber-900">2</h3>
               </div>
             </div>
           </CardBody>
         </Card>
         
-        <Card className="bg-success-50 border border-success-100">
+        <Card className="bg-violet-50 border border-violet-100">
           <CardBody>
             <div className="flex items-center">
-              <div className="p-3 bg-green-100 rounded-full mr-4">
-                <TrendingUp size={20} className="text-success-700" />
+              <div className="p-3 bg-violet-100 rounded-full mr-4">
+                <TrendingUp size={20} className="text-violet-700" />
               </div>
               <div>
-                <p className="text-sm font-medium text-success-700">Profile Views</p>
-                <h3 className="text-xl font-semibold text-success-900">24</h3>
+                <p className="text-sm font-medium text-violet-700">Profile Views</p>
+                <h3 className="text-xl font-semibold text-violet-900">24</h3>
               </div>
             </div>
           </CardBody>
