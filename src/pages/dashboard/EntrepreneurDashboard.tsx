@@ -16,6 +16,10 @@ export const EntrepreneurDashboard: React.FC = () => {
   const [collaborationRequests, setCollaborationRequests] = useState<CollaborationRequest[]>([]);
   const [recommendedInvestors, setRecommendedInvestors] = useState(investors.slice(0, 3));
   
+  // --- ADDED: SAFE WALKTHROUGH STATE ---
+  const [showGuide, setShowGuide] = useState(true);
+  // --------------------------------------
+  
   useEffect(() => {
     if (user) {
       const requests = getRequestsForEntrepreneur(user.id);
@@ -37,6 +41,24 @@ export const EntrepreneurDashboard: React.FC = () => {
   
   return (
     <div className="space-y-6 animate-fade-in">
+      
+      {/* --- ADDED: SAFE WALKTHROUGH GUIDE BANNER --- */}
+      {showGuide && (
+        <div className="bg-indigo-600 text-white p-4 rounded-lg flex justify-between items-center shadow-lg">
+          <div>
+            <p className="font-bold text-lg">👋 Welcome to your Dashboard!</p>
+            <p className="text-indigo-200 text-sm mt-1">Start by checking your <strong>Pending Requests</strong> below, then click <strong>Find Investors</strong> to grow your network.</p>
+          </div>
+          <button 
+            onClick={() => setShowGuide(false)} 
+            className="bg-indigo-500 hover:bg-indigo-400 text-white font-bold px-4 py-2 rounded-md transition"
+          >
+            Got it!
+          </button>
+        </div>
+      )}
+      {/* --------------------------------------------- */}
+
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Welcome, {user.name}</h1>
