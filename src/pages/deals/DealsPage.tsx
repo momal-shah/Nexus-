@@ -341,4 +341,4 @@ export const DealsPage: React.FC = () => {
       </Card>
     </div>
   );
-};
+};clearInterval
