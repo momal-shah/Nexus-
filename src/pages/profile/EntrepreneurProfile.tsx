@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MessageCircle, Users, Calendar, Building2, MapPin, UserCircle, FileText, DollarSign, Send } from 'lucide-react';
 import { Avatar } from '../../components/ui/Avatar';
@@ -17,6 +17,16 @@ export const EntrepreneurProfile: React.FC = () => {
   // Fetch entrepreneur data
   const entrepreneur = findUserById(id || '') as Entrepreneur | null;
   
+  // --- ADDED: States to fix Request & Document bugs ---
+  const [isRequested, setIsRequested] = useState(false);
+  const [viewingDoc, setViewingDoc] = useState<string | null>(null);
+  // ---------------------------------------------------
+
+  // Initialize the request state once we know who the user is
+  const hasRequestedCollaboration = isRequested || (currentUser?.role === 'investor' && id 
+    ? getRequestsFromInvestor(currentUser.id).some(req => req.entrepreneurId === id)
+    : false);
+  
   if (!entrepreneur || entrepreneur.role !== 'entrepreneur') {
     return (
       <div className="text-center py-12">
@@ -32,11 +42,7 @@ export const EntrepreneurProfile: React.FC = () => {
   const isCurrentUser = currentUser?.id === entrepreneur.id;
   const isInvestor = currentUser?.role === 'investor';
   
-  // Check if the current investor has already sent a request to this entrepreneur
-  const hasRequestedCollaboration = isInvestor && id 
-    ? getRequestsFromInvestor(currentUser.id).some(req => req.entrepreneurId === id)
-    : false;
-  
+  // --- MODIFIED: Fixed the handleSendRequest function ---
   const handleSendRequest = () => {
     if (isInvestor && currentUser && id) {
       createCollaborationRequest(
@@ -45,14 +51,36 @@ export const EntrepreneurProfile: React.FC = () => {
         `I'm interested in learning more about ${entrepreneur.startupName} and would like to explore potential investment opportunities.`
       );
       
-      // In a real app, we would refresh the data or update state
-      // For this demo, we'll force a page reload
-      window.location.reload();
+      // Instantly update the button without reloading the whole page
+      setIsRequested(true);
     }
   };
+  // ----------------------------------------------------
   
   return (
     <div className="space-y-6 animate-fade-in">
+      
+      {/* --- ADDED: Document Viewer Modal --- */}
+      {viewingDoc && (
+        <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setViewingDoc(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+              <h3 className="text-lg font-bold text-gray-900">{viewingDoc}</h3>
+              <button onClick={() => setViewingDoc(null)} className="text-gray-400 hover:text-gray-600 font-bold text-xl">✕</button>
+            </div>
+            <div className="p-6 flex-1 overflow-y-auto">
+              <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-10 flex flex-col items-center justify-center text-center min-h-[300px]">
+                <FileText size={48} className="text-gray-300 mb-4" />
+                <p className="text-gray-600 font-medium">{viewingDoc} Preview</p>
+                <p className="text-sm text-gray-400 mt-1">This is a mockup of the {viewingDoc.toLowerCase()} document.</p>
+                <Button className="mt-6">Download PDF</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* -------------------------------------- */}
+
       {/* Profile header */}
       <Card>
         <CardBody className="sm:flex sm:items-start sm:justify-between p-6">
@@ -289,6 +317,7 @@ export const EntrepreneurProfile: React.FC = () => {
             </CardHeader>
             <CardBody>
               <div className="space-y-3">
+                {/* --- MODIFIED: Added onClick to View buttons --- */}
                 <div className="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
                   <div className="p-2 bg-primary-50 rounded-md mr-3">
                     <FileText size={18} className="text-primary-700" />
@@ -297,7 +326,7 @@ export const EntrepreneurProfile: React.FC = () => {
                     <h3 className="text-sm font-medium text-gray-900">Pitch Deck</h3>
                     <p className="text-xs text-gray-500">Updated 2 months ago</p>
                   </div>
-                  <Button variant="outline" size="sm">View</Button>
+                  <Button variant="outline" size="sm" onClick={() => setViewingDoc('Pitch Deck')}>View</Button>
                 </div>
                 
                 <div className="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
@@ -308,7 +337,7 @@ export const EntrepreneurProfile: React.FC = () => {
                     <h3 className="text-sm font-medium text-gray-900">Business Plan</h3>
                     <p className="text-xs text-gray-500">Updated 1 month ago</p>
                   </div>
-                  <Button variant="outline" size="sm">View</Button>
+                  <Button variant="outline" size="sm" onClick={() => setViewingDoc('Business Plan')}>View</Button>
                 </div>
                 
                 <div className="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
@@ -319,8 +348,9 @@ export const EntrepreneurProfile: React.FC = () => {
                     <h3 className="text-sm font-medium text-gray-900">Financial Projections</h3>
                     <p className="text-xs text-gray-500">Updated 2 weeks ago</p>
                   </div>
-                  <Button variant="outline" size="sm">View</Button>
+                  <Button variant="outline" size="sm" onClick={() => setViewingDoc('Financial Projections')}>View</Button>
                 </div>
+                {/* --------------------------------------------- */}
               </div>
               
               {!isCurrentUser && isInvestor && (

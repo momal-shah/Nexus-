@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, PieChart, Filter, Search, PlusCircle, Video } from 'lucide-react';
+import { Users, PieChart, Filter, Search, PlusCircle, Video, X } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Card, CardBody, CardHeader } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
@@ -15,6 +15,9 @@ export const InvestorDashboard: React.FC = () => {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
+  
+  // ADDED: State for the info popup
+  const [cardInfo, setCardInfo] = useState<string | null>(null);
   
   if (!user) return null;
   
@@ -98,8 +101,12 @@ export const InvestorDashboard: React.FC = () => {
       </div>
       
       {/* Stats summary - INVESTOR FINANCIAL THEME */}
+      {/* ADDED: cursor-pointer, hover:scale, and onClick to all 4 cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-slate-800 border border-slate-700">
+        <Card 
+          className="bg-slate-800 border border-slate-700 cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg hover:shadow-slate-900/50"
+          onClick={() => setCardInfo("Total value of all your current startup investments and equity holdings.")}
+        >
           <CardBody>
             <div className="flex items-center">
               <div className="p-3 bg-slate-700 rounded-full mr-4">
@@ -113,7 +120,10 @@ export const InvestorDashboard: React.FC = () => {
           </CardBody>
         </Card>
         
-        <Card className="bg-slate-800 border border-slate-700">
+        <Card 
+          className="bg-slate-800 border border-slate-700 cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg hover:shadow-slate-900/50"
+          onClick={() => setCardInfo("Number of startup deals that are currently active and in progress.")}
+        >
           <CardBody>
             <div className="flex items-center">
               <div className="p-3 bg-slate-700 rounded-full mr-4">
@@ -129,7 +139,10 @@ export const InvestorDashboard: React.FC = () => {
           </CardBody>
         </Card>
         
-        <Card className="bg-slate-800 border border-slate-700">
+        <Card 
+          className="bg-slate-800 border border-slate-700 cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg hover:shadow-slate-900/50"
+          onClick={() => setCardInfo("Total number of startup profiles you have viewed and analyzed this month.")}
+        >
           <CardBody>
             <div className="flex items-center">
               <div className="p-3 bg-slate-700 rounded-full mr-4">
@@ -143,8 +156,10 @@ export const InvestorDashboard: React.FC = () => {
           </CardBody>
         </Card>
 
-        {/* FAKE MINI CHART - Makes it look like a real financial dashboard */}
-        <Card className="bg-slate-800 border border-slate-700">
+        <Card 
+          className="bg-slate-800 border border-slate-700 cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg hover:shadow-slate-900/50"
+          onClick={() => setCardInfo("A visual breakdown of your investment activities, deal screenings, and messages sent over the last 7 days.")}
+        >
           <CardBody>
             <p className="text-sm font-medium text-slate-400 mb-3">Monthly Activity</p>
             <div className="flex items-end gap-1.5 h-10">
@@ -159,6 +174,19 @@ export const InvestorDashboard: React.FC = () => {
           </CardBody>
         </Card>
       </div>
+
+      {/* ADDED: Info Popup Box */}
+      {cardInfo && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 max-w-md w-[90%] bg-slate-900 border border-slate-700 text-white p-4 rounded-2xl shadow-2xl flex items-start gap-3 animate-fade-in">
+          <div className="mt-0.5 text-cyan-400">
+            <PieChart size={20} />
+          </div>
+          <p className="text-sm text-slate-200 flex-1">{cardInfo}</p>
+          <button onClick={() => setCardInfo(null)} className="text-slate-400 hover:text-white transition">
+            <X size={18} />
+          </button>
+        </div>
+      )}
       
       {/* Entrepreneurs grid */}
       <div>

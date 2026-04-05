@@ -30,7 +30,7 @@ export const EntrepreneurCard: React.FC<EntrepreneurCardProps> = ({
   return (
     <Card 
       hoverable 
-      className="transition-all duration-300 h-full"
+      className="transition-all duration-300 h-full hover:shadow-xl hover:-translate-y-1"
       onClick={handleViewProfile}
     >
       <CardBody className="flex flex-col">

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { MessageCircle, Building2, MapPin, UserCircle, BarChart3, Briefcase } from 'lucide-react';
+import { MessageCircle, Building2, MapPin, UserCircle, BarChart3, Briefcase, X } from 'lucide-react';
 import { Avatar } from '../../components/ui/Avatar';
 import { Button } from '../../components/ui/Button';
 import { Card, CardBody, CardHeader } from '../../components/ui/Card';
@@ -13,8 +13,9 @@ export const InvestorProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user: currentUser } = useAuth();
   
-  // Fetch investor data
   const investor = findUserById(id || '') as Investor | null;
+  
+  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
   
   if (!investor || investor.role !== 'investor') {
     return (
@@ -32,7 +33,31 @@ export const InvestorProfile: React.FC = () => {
   
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Profile header */}
+
+      {selectedCompany && (
+        <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setSelectedCompany(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
+                  <Briefcase size={18} className="text-primary-700" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">{selectedCompany}</h3>
+              </div>
+              <button onClick={() => setSelectedCompany(null)} className="text-gray-400 hover:text-gray-600 transition">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-gray-500">Investment Year: <span className="font-medium text-gray-800">2022</span></p>
+              <p className="text-sm text-gray-500">Sector: <span className="font-medium text-gray-800">FinTech / SaaS</span></p>
+              <p className="text-sm text-gray-700">This is a mockup of the {selectedCompany} details page. In a real app, this would show full company metrics, ROI, and contact details of the founders.</p>
+              <Button className="w-full" onClick={() => setSelectedCompany(null)}>Close</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Card>
         <CardBody className="sm:flex sm:items-start sm:justify-between p-6">
           <div className="sm:flex sm:space-x-6">
@@ -87,9 +112,7 @@ export const InvestorProfile: React.FC = () => {
       </Card>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main content - left side */}
         <div className="lg:col-span-2 space-y-6">
-          {/* About */}
           <Card>
             <CardHeader>
               <h2 className="text-lg font-medium text-gray-900">About</h2>
@@ -99,7 +122,6 @@ export const InvestorProfile: React.FC = () => {
             </CardBody>
           </Card>
           
-          {/* Investment Interests */}
           <Card>
             <CardHeader>
               <h2 className="text-lg font-medium text-gray-900">Investment Interests</h2>
@@ -149,7 +171,6 @@ export const InvestorProfile: React.FC = () => {
             </CardBody>
           </Card>
           
-          {/* Portfolio Companies */}
           <Card>
             <CardHeader className="flex justify-between items-center">
               <h2 className="text-lg font-medium text-gray-900">Portfolio Companies</h2>
@@ -158,7 +179,11 @@ export const InvestorProfile: React.FC = () => {
             <CardBody>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {investor.portfolioCompanies.map((company, index) => (
-                  <div key={index} className="flex items-center p-3 border border-gray-200 rounded-md">
+                  <div 
+                    key={index} 
+                    className="flex items-center p-3 border border-gray-200 rounded-md cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary-300 hover:bg-primary-50/30 hover:-translate-y-0.5"
+                    onClick={() => setSelectedCompany(company)}
+                  >
                     <div className="p-3 bg-primary-50 rounded-md mr-3">
                       <Briefcase size={18} className="text-primary-700" />
                     </div>
@@ -173,9 +198,7 @@ export const InvestorProfile: React.FC = () => {
           </Card>
         </div>
         
-        {/* Sidebar - right side */}
         <div className="space-y-6">
-          {/* Investment Details */}
           <Card>
             <CardHeader>
               <h2 className="text-lg font-medium text-gray-900">Investment Details</h2>
@@ -226,7 +249,6 @@ export const InvestorProfile: React.FC = () => {
             </CardBody>
           </Card>
           
-          {/* Stats */}
           <Card>
             <CardHeader>
               <h2 className="text-lg font-medium text-gray-900">Investment Stats</h2>

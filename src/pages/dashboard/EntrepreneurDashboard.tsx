@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Bell, Calendar, TrendingUp, AlertCircle, PlusCircle, Video } from 'lucide-react';
+import { Users, Bell, Calendar, TrendingUp, AlertCircle, PlusCircle, Video, X } from 'lucide-react'; // Added X
 import { Button } from '../../components/ui/Button';
 import { Card, CardBody, CardHeader } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
@@ -18,6 +18,9 @@ export const EntrepreneurDashboard: React.FC = () => {
   
   // --- ADDED: SAFE WALKTHROUGH STATE ---
   const [showGuide, setShowGuide] = useState(true);
+  
+  // --- ADDED: INFO POPUP STATE ---
+  const [cardInfo, setCardInfo] = useState<string | null>(null);
   // --------------------------------------
   
   useEffect(() => {
@@ -79,8 +82,12 @@ export const EntrepreneurDashboard: React.FC = () => {
       </div>
       
       {/* Summary cards - ENTREPRENEUR WORKSPACE THEME */}
+      {/* ADDED: cursor-pointer, hover:scale, and onClick to all 4 cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-blue-50 border border-blue-100">
+        <Card 
+          className="bg-blue-50 border border-blue-100 cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg hover:shadow-blue-200/50"
+          onClick={() => setCardInfo("Investors waiting for your approval to view your pitch deck and business details.")}
+        >
           <CardBody>
             <div className="flex items-center">
               <div className="p-3 bg-blue-100 rounded-full mr-4">
@@ -94,7 +101,10 @@ export const EntrepreneurDashboard: React.FC = () => {
           </CardBody>
         </Card>
         
-        <Card className="bg-emerald-50 border border-emerald-100">
+        <Card 
+          className="bg-emerald-50 border border-emerald-100 cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg hover:shadow-emerald-200/50"
+          onClick={() => setCardInfo("Total number of investors you have successfully connected and collaborated with.")}
+        >
           <CardBody>
             <div className="flex items-center">
               <div className="p-3 bg-emerald-100 rounded-full mr-4">
@@ -110,7 +120,10 @@ export const EntrepreneurDashboard: React.FC = () => {
           </CardBody>
         </Card>
         
-        <Card className="bg-amber-50 border border-amber-100">
+        <Card 
+          className="bg-amber-50 border border-amber-100 cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg hover:shadow-amber-200/50"
+          onClick={() => setCardInfo("Upcoming video calls and pitch sessions you have booked with investors.")}
+        >
           <CardBody>
             <div className="flex items-center">
               <div className="p-3 bg-amber-100 rounded-full mr-4">
@@ -124,7 +137,10 @@ export const EntrepreneurDashboard: React.FC = () => {
           </CardBody>
         </Card>
         
-        <Card className="bg-violet-50 border border-violet-100">
+        <Card 
+          className="bg-violet-50 border border-violet-100 cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg hover:shadow-violet-200/50"
+          onClick={() => setCardInfo("Number of times investors have viewed your startup profile this week.")}
+        >
           <CardBody>
             <div className="flex items-center">
               <div className="p-3 bg-violet-100 rounded-full mr-4">
@@ -138,6 +154,19 @@ export const EntrepreneurDashboard: React.FC = () => {
           </CardBody>
         </Card>
       </div>
+
+      {/* ADDED: Info Popup Box */}
+      {cardInfo && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 max-w-md w-[90%] bg-slate-900 border border-slate-700 text-white p-4 rounded-2xl shadow-2xl flex items-start gap-3 animate-fade-in">
+          <div className="mt-0.5 text-blue-400">
+            <TrendingUp size={20} />
+          </div>
+          <p className="text-sm text-slate-200 flex-1">{cardInfo}</p>
+          <button onClick={() => setCardInfo(null)} className="text-slate-400 hover:text-white transition">
+            <X size={18} />
+          </button>
+        </div>
+      )}
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Collaboration requests */}

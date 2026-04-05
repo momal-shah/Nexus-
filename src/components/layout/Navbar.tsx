@@ -1,12 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Menu, X, Bell, MessageCircle, User, LogOut, Building2, CircleDollarSign } from 'lucide-react';
+import { Menu, X, Bell, MessageCircle, User, LogOut, Building2, CircleDollarSign, Check } from 'lucide-react'; // Added Check
 import { useAuth } from '../../context/AuthContext';
 import { Avatar } from '../ui/Avatar';
 import { Button } from '../ui/Button';
 
 export const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // --- ADDED: Notification Dropdown State ---
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: '1', text: 'New investment request from John Doe', read: false, time: '2m ago' },
+    { id: '2', text: 'Meeting reminder: Pitch Deck Review', read: false, time: '1h ago' },
+    { id: '3', text: 'Sarah Smith accepted your connection', read: true, time: '1d ago' },
+  ]);
+  // -----------------------------------------
+
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   
@@ -18,13 +28,17 @@ export const Navbar: React.FC = () => {
     logout();
     navigate('/login');
   };
-  
-  // User dashboard route based on role
+
+  // --- ADDED: Mark all as read function ---
+  const markAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
+  // ----------------------------------------
+
   const dashboardRoute = user?.role === 'entrepreneur' 
     ? '/dashboard/entrepreneur' 
     : '/dashboard/investor';
   
-  // User profile route based on role and ID
   const profileRoute = user 
     ? `/profile/${user.role}/${user.id}` 
     : '/login';
@@ -51,6 +65,56 @@ export const Navbar: React.FC = () => {
       path: profileRoute,
     }
   ];
+
+  // ADDED: Calculate unread count
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  // --- ADDED: Reusable Notification Dropdown Component ---
+  const NotificationDropdown = () => (
+    <>
+      {/* Invisible background to close dropdown when clicking outside */}
+      {isNotifOpen && <div className="fixed inset-0 z-40" onClick={() => setIsNotifOpen(false)} />}
+      
+      <div className={`absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 transition-all ${isNotifOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}>
+        
+        {/* Header */}
+        <div className="p-4 border-b border-gray-100 flex justify-between items-center">
+          <h3 className="text-sm font-bold text-gray-900">Notifications</h3>
+          <button 
+            onClick={markAllRead} 
+            className="text-xs font-semibold text-primary-600 hover:text-primary-700 flex items-center gap-1 transition"
+          >
+            <Check size={14} />
+            Mark all as read
+          </button>
+        </div>
+        
+        {/* List */}
+        <div className="max-h-64 overflow-y-auto">
+          {notifications.length === 0 ? (
+            <p className="p-4 text-sm text-gray-500 text-center">No notifications</p>
+          ) : (
+            notifications.map((notif) => (
+              <div 
+                key={notif.id}
+                onClick={() => {
+                  setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
+                }}
+                className={`p-3 border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition flex items-start gap-3 ${!notif.read ? 'bg-primary-50/50' : ''}`}
+              >
+                <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${notif.read ? 'bg-gray-300' : 'bg-primary-600'}`} />
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm ${notif.read ? 'text-gray-500' : 'text-gray-800 font-medium'}`}>{notif.text}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{notif.time}</p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </>
+  );
+  // ---------------------------------------------------
   
   return (
     <nav className="bg-white shadow-md">
@@ -74,14 +138,35 @@ export const Navbar: React.FC = () => {
             {user ? (
               <div className="flex items-center space-x-4">
                 {navLinks.map((link, index) => (
-                  <Link
-                    key={index}
-                    to={link.path}
-                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
-                  >
-                    <span className="mr-2">{link.icon}</span>
-                    {link.text}
-                  </Link>
+                  // --- MODIFIED: Added special handling for Notification Bell ---
+                  link.text === 'Notifications' ? (
+                    <div key={index} className="relative">
+                      <button
+                        onClick={() => setIsNotifOpen(!isNotifOpen)}
+                        className="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                      >
+                        <span className="mr-2">{link.icon}</span>
+                        {link.text}
+                        {/* Red dot for unread count */}
+                        {unreadCount > 0 && (
+                          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center font-bold">
+                            {unreadCount}
+                          </span>
+                        )}
+                      </button>
+                      <NotificationDropdown />
+                    </div>
+                  ) : (
+                  // ---------------------------------------------------------------
+                    <Link
+                      key={index}
+                      to={link.path}
+                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                    >
+                      <span className="mr-2">{link.icon}</span>
+                      {link.text}
+                    </Link>
+                  )
                 ))}
                 
                 <Button 
@@ -151,15 +236,37 @@ export const Navbar: React.FC = () => {
                 
                 <div className="border-t border-gray-200 pt-2">
                   {navLinks.map((link, index) => (
-                    <Link
-                      key={index}
-                      to={link.path}
-                      className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <span className="mr-3">{link.icon}</span>
-                      {link.text}
-                    </Link>
+                    // --- MODIFIED: Added special handling for Mobile Notification Bell ---
+                    link.text === 'Notifications' ? (
+                      <div key={index} className="relative">
+                        <button
+                          onClick={() => setIsNotifOpen(!isNotifOpen)}
+                          className="flex w-full items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md relative"
+                        >
+                          <span className="mr-3">{link.icon}</span>
+                          {link.text}
+                          {unreadCount > 0 && (
+                            <span className="ml-2 w-5 h-5 bg-red-500 rounded-full text-white text-xs flex items-center justify-center font-bold">
+                              {unreadCount}
+                            </span>
+                          )}
+                        </button>
+                        <div className="ml-4">
+                          <NotificationDropdown />
+                        </div>
+                      </div>
+                    ) : (
+                    // -------------------------------------------------------------------
+                      <Link
+                        key={index}
+                        to={link.path}
+                        className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <span className="mr-3">{link.icon}</span>
+                        {link.text}
+                      </Link>
+                    )
                   ))}
                   
                   <button
